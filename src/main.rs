@@ -17,8 +17,6 @@ fn main() {
     quicker_sort(&mut test_input);
 
     let sorted = test_input.clone();
-    println!("{:?}", sorted);
-
     test_input.sort_unstable();
     assert_eq!(sorted, test_input);
 
@@ -100,5 +98,48 @@ fn _normal_quick_sort(xs: Vec<u64>) -> Vec<u64> {
         let recurse_more_than: Vec<u64> = _normal_quick_sort(more_than);
 
         [recurse_less_than, equal, recurse_more_than].concat()
+    }
+}
+
+// STACK_OVERFLOWED when input is longer than 400
+// ANY CHANGE TO IMPROVE THIS VERSION...?
+fn _parallel_quicker_sort(xs: &mut [u64]) {
+    let length: usize = xs.len();
+
+    if length == 2 {
+        if xs.first().unwrap() > xs.last().unwrap() {
+            xs.swap(0, 1);
+        }
+    }
+
+    if length > 2 {
+        // randomize pivot
+        let mut rng: ThreadRng = rand::thread_rng();
+        let mut pivot: usize = rng.gen_range(1, length);
+        let pivot_value: u64 = *xs.get(pivot).unwrap();
+
+        // move pivot to the front
+        xs.swap(0, pivot);
+        pivot = 0;
+
+        for i in 1..length {
+            // if xs[i] less than pivot value
+            // swap xs[i] with xs[pivot+1]
+            if xs.get(i).unwrap() < &pivot_value {
+                pivot += 1;
+                xs.swap(i, pivot)
+            }
+        }
+
+        // swap pivot value back to place
+        xs.swap(0, pivot);
+        // after swapping done
+        // every n less than or eq to pivot value
+        // will be on the left of pivot
+
+        let (less_than_or_eq, more_than_or_eq) = xs.split_at_mut(pivot);
+
+        join(|| _parallel_quicker_sort(less_than_or_eq),
+             || _parallel_quicker_sort(more_than_or_eq), );
     }
 }
