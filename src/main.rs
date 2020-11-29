@@ -40,6 +40,7 @@ fn quicker_sort(xs: &mut [u64]) {
     }
 
     if length > 2 {
+        // randomize pivot
         let mut rng: ThreadRng = rand::thread_rng();
         let mut pivot: usize = rng.gen_range(1, length);
         let pivot_value: u64 = *xs.get(pivot).unwrap();
@@ -62,7 +63,6 @@ fn quicker_sort(xs: &mut [u64]) {
         // after swapping done
         // every n less than or eq to pivot value
         // will be on the left of pivot
-        println!("{:?}", xs);
 
         let (less_than_or_eq, more_than_or_eq) = xs.split_at_mut(pivot);
 
