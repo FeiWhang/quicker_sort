@@ -3,6 +3,7 @@ use rand::Rng;
 use rand::rngs::ThreadRng;
 use std::fs::File;
 use std::io::prelude::Read;
+use rayon::join;
 
 fn main() {
 
@@ -21,15 +22,16 @@ fn main() {
     assert_eq!(sorted, test_input);
 
 }
-// 3-way Quick-Sort: http://www.cs.princeton.edu/~rs/talks/QuicksortIsOptimal.pdf
+
+// 3-way Quick-Sort Algo from: http://www.cs.princeton.edu/~rs/talks/QuicksortIsOptimal.pdf
 fn quicker_sort(xs: &mut Vec<i64>) {
     fn sort_helper(xs: &mut Vec<i64>, left: i64, right: i64) {
         if right <= left { return }
 
         let mut i: i64 = left - 1;
-        let mut j: i64 = right.clone();
+        let mut j: i64 = right;
         let mut p: i64 = left - 1;
-        let mut q: i64 = right.clone();
+        let mut q: i64 = right;
         let v: i64 = *xs.get(right as usize).unwrap();
 
         loop {
@@ -82,7 +84,6 @@ fn quicker_sort(xs: &mut Vec<i64>) {
     }
 }
 
-
 fn _normal_quick_sort(xs: Vec<u64>) -> Vec<u64> {
     if xs.len() <= 1 { xs }
     else {
@@ -103,7 +104,7 @@ fn _normal_quick_sort(xs: Vec<u64>) -> Vec<u64> {
 
 // STACK_OVERFLOWED when input is longer than 400
 // ANY CHANGE TO IMPROVE THIS VERSION...?
-fn _parallel_quicker_sort(xs: &mut [u64]) {
+fn _parallel_quicker_sort(xs: &mut [i64]) {
     let length: usize = xs.len();
 
     if length == 2 {
@@ -116,7 +117,7 @@ fn _parallel_quicker_sort(xs: &mut [u64]) {
         // randomize pivot
         let mut rng: ThreadRng = rand::thread_rng();
         let mut pivot: usize = rng.gen_range(1, length);
-        let pivot_value: u64 = *xs.get(pivot).unwrap();
+        let pivot_value: i64 = *xs.get(pivot).unwrap();
 
         // move pivot to the front
         xs.swap(0, pivot);
